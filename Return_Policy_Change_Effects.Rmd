@@ -3,7 +3,7 @@ title: "Return Policy Change Effects"
 author: Greg Murray
 ---
 
-#QUESTION 3: Policy change impact on online returns.
+#Analyis 1: Policy change impact on online returns.
 #dependent variable=return_amt; key independent variables=post_policy,study_group, post_policy*studygroup 
 
 ```{r}
@@ -21,7 +21,6 @@ library(ggplot2)
 library(sandwich)
 library(VIF)
 library(msm)
-
 ```
 
 
@@ -32,7 +31,6 @@ setwd('c:/users/greg/r_projects/bus_analytics_project')
 onl_returns<-read.csv('onl_store_data2.csv')
 summary(onl_returns)
 onl_returns<-na.omit(onl_returns)
-
 ```
 
 
@@ -77,7 +75,6 @@ plot(onl_returns$child_ratio, log(onl_returns$return_amt+1))
 boxplot(log(onl_returns$return_amt+1)~onl_returns$avg_income_code, xlab="avg income code")
 boxplot(log(onl_returns$return_amt+1)~onl_returns$avg_age_band, xlab="avg age band")
 boxplot(log(onl_returns$return_amt+1)~onl_returns$, xlab="avg income code")
-
 ```
 
 ```{r}
@@ -106,7 +103,6 @@ m2_onl<-as.matrix(cor(df2_onl))
 View(m2_onl)
 vif(df2)
 # No dangerous multi-collinearity
-
 ```
 
 ```{r}
@@ -122,7 +118,6 @@ anova(model1_onl, model2_onl, test="Chisq")
 #Do not add avg_length of residence
 
 modelOLSfin_onl<-model1_onl
-
 ```
 
 
@@ -135,7 +130,6 @@ plot(residual1, ylab="Residuals", xlab="all resids")
 plot(log(onl_returns$daily_sales_amt+1),residual1, ylab="Residuals", xlab="daily_sales_amt") # As the residual plot indicates, residual weirdness we have possible heteroskedasticity
 gqtest(modelOLSfin_onl) #no heteroskedasticity
 bptest(modelOLSfin_onl) #heteroskedasticity 
-
 ```
 
 ```{r}
@@ -164,8 +158,6 @@ View(m4_onl)
 ivregmodel_onl<-ivreg(log(return_amt+1)~post_policy+study_group+log(daily_sales_amt+1)+avg_income_code+avg_age_band+post_policy*study_group|sales_volume_group+store_number_of_skus+post_policy+study_group+avg_income_code+avg_age_band+post_policy*study_group, data=onl_returns)
 summary(ivregmodel_onl,diagnostics = TRUE)
 #With F-statistic signficant the IVs relevance assumption holds, Sargan insigificant the exogeneity assumption holds but Wu-Hausman insignificant means there was no endogeneity in the OLS model
-
-
 ```
 
 ```{r}
@@ -185,7 +177,6 @@ marg_means<-data.frame(post_policy=seq(0,1), study_group=seq(0,1), avg_income_co
 predict(poisson1, marg_means, type="response", se.fit=TRUE)
 
 summary(negbin1_ol<-glm.nb((return_cnt+1)~post_policy+study_group+log(daily_sales_cnt+1)+avg_age_band+avg_income_code+avg_age_band+post_policy*study_group, data=onl_returns))
-
 ```
 
 ```{r}
@@ -204,7 +195,6 @@ with(negbin1_ol, pchisq(null.deviance - deviance, df.null - df.residual, lower.t
 X2 <- 2 * (logLik(negbin1_ol) - logLik(poisson1))
 X2
 pchisq(X2, df = 1, lower.tail=FALSE) # Negative Binomial over Poisson
-
 ```
 
 ```{r}
@@ -224,7 +214,6 @@ rexp.est
 
 plot(effect(term="post_policy*study_group",mod=negbin1_ol,xlevel=2),multiline=TRUE)
 #***NEGBIN CONCLUSION: Interaction term is insignificant - policy change likely has no effect on returns in online channel
-
 ```
 
 ```{r}
@@ -255,12 +244,15 @@ rexp.est[, "Robust SE"] <- s # replace SEs with estimates for exponentiated coef
 rexp.est 
  #Beta for post_policy is insignicant, therefore without a control group there is no way to isolate the policy change effect in the study group.
 
-#***Q3 FINAL CONCLUSION: policy change likely has no effect on returns in online channel
-
+#*** FINAL CONCLUSION: policy change likely has no effect on returns in online channel
 ```
 
 
-#QUESTION 4: Policy change impact on bms returns.
+#______________________________________________________________________________________________________________________#
+
+
+
+#Analysis 2: Policy change impact on bms returns.
 #Model 0 OLS; dependent variable=return_amt; key independent variables=post_policy,study_group, #post_policy*studygroup 
 ```{r}
 #Data Initialization}
@@ -368,8 +360,6 @@ m3_bm<-as.matrix(cor(df3_bm))
 View(m3_bm)
 vif(m3_bm)
 # No dangerous multi-collinearity 
-
-
 ```
 
 ```{r}
@@ -377,7 +367,6 @@ vif(m3_bm)
 
 model1_bm<-lm(log(return_amt+1)~post_policy+study_group+log(monthly_sales_cnt+1)+log(sa_avg_years_of_exp+1)+avg_income_code+avg_age_band+post_policy*study_group, data=bms_returns)
 summary(model1_bm)
-
 
 model2_bm<-lm(log(return_amt+1)~post_policy+study_group+log(monthly_sales_cnt+1)+log(sa_avg_years_of_exp+1)+avg_income_code+avg_age_band+avg_length_residence+post_policy*study_group, data=bms_returns)
 summary(model2_bm)
@@ -452,7 +441,6 @@ m6_bm<-as.matrix(cor(df6_bm))
 mean(m6_bm)
 View(m6_bm)
 #No possible IV candidates 
-
 ```
 
 
@@ -518,7 +506,6 @@ rexp.est
 #***NEGBIN MODEL CONCLUSION: Policy change decreases number of returns by 25.86%
 
 plot(effect(term="post_policy*study_group",mod=negbin1_bm,xlevel=2),multiline=TRUE)
-
 ```
 
 ```{r}
