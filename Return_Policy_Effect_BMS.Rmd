@@ -337,6 +337,6 @@ rexp.est
 plot(effect(term="post_policy",mod=negbin_sg,xlevel=2),multiline=TRUE)
 ```
 
->## **FINAL CONCLUSION:**
+## **FINAL CONCLUSION:**
 >## **Policy change leads to 25.86% decrease in the number of returns and a 36.62% decrease in the return dollar amount for bms channel**
 
