@@ -49,18 +49,20 @@ hist(onl_returns$homeowner_ratio)
 hist(log(onl_returns$homeowner_ratio+1))#
 hist(onl_returns$child_ratio) #
 hist(log(onl_returns$child_ratio+1))
-# Raw data plots with dependent var
+```
 
+>#### Raw data plots with dependent var
+```{r}
 sg<-subset(onl_returns, study_group==1)
 cg<-subset(onl_returns, study_group==0)
 boxplot(log(sg$return_amt+1)~sg$post_policy,xlab="post_policy (study group)")
 ```
->##### Returns go down after policy change in the study group (sans regression modelling)
+##### Returns go down after policy change in the study group (sans regression modelling)
 
 ```{r}
 boxplot(log(cg$return_amt+1)~cg$post_policy,xlab="post_policy (control group")
 ```
->##### Returns go down up slightly after policy change in the control group (sans regression modelling)
+##### Returns go down up slightly after policy change in the control group (sans regression modelling)
 
 ```{r}
 plot(log(onl_returns$daily_sales_amt+1), log(onl_returns$return_amt+1))
