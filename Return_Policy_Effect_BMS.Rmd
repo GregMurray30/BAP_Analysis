@@ -124,16 +124,16 @@ vif(m2_bm)
 ```
 >##### remove sa_gender and homeowner_ratio. Using log of monthly_sales_cnt instead of amount decreases multicollinearity with other variables.
 
+```{r}
 df3_bm<-data.frame(bms_returns$post_policy, bms_returns$study_group,log(bms_returns$monthly_sales_cnt+1),log(bms_returns$sa_avg_years_of_exp+1),bms_returns$avg_income_code,bms_returns$avg_age_band)
 m3_bm<-as.matrix(cor(df3_bm))
 View(m3_bm)
 vif(m3_bm)
-# No dangerous multi-collinearity 
 ```
+>##### No dangerous multi-collinearity 
 
+### OLS: Design and Refine Models
 ```{r}
-#OLS: Design and Refine Models}
-
 model1_bm<-lm(log(return_amt+1)~post_policy+study_group+log(monthly_sales_cnt+1)+log(sa_avg_years_of_exp+1)+avg_income_code+avg_age_band+post_policy*study_group, data=bms_returns)
 summary(model1_bm)
 
@@ -141,26 +141,27 @@ model2_bm<-lm(log(return_amt+1)~post_policy+study_group+log(monthly_sales_cnt+1)
 summary(model2_bm)
 
 anova(model1_bm, model2_bm, test="Chisq")
-##Length of residence does not improve model fit
+```
+>##### Length of residence does not improve model fit
 
+```{r}
 model3_bm<-lm(log(return_amt+1)~post_policy+study_group+log(monthly_sales_cnt+1)+log(sa_avg_years_of_exp+1)+sa_avg_rate_of_pay+avg_income_code+avg_age_band+post_policy*study_group, data=bms_returns)
 summary(model3_bm)
 
 anova(model1_bm, model3_bm, test="Chisq")
-# sa_avg_rate_of_pay improves fit
-
-modelOLSfin_bm<-model3_bm # FINAL OLS MODEL
-
-
-pred<-predict(modelOLSfin_bm, type="response") 
-summary(pred)#All positive pred values - good
-
 ```
-
+>##### sa_avg_rate_of_pay improves fit
 
 ```{r}
-#Heteroscedasticity Testing}
+modelOLSfin_bm<-model3_bm # FINAL OLS MODEL
 
+pred<-predict(modelOLSfin_bm, type="response") 
+summary(pred)
+```
+>##### All positive pred values - good
+
+### Heteroscedasticity Testing
+```{r}
 residual1_bm=resid(modelOLSfin_bm)
 plot(residual1_bm, ylab="Residuals", xlab="all vars") 
 qqnorm(residual1_bm)
@@ -169,18 +170,18 @@ plot(log(bms_returns$monthly_sales_cnt+1),residual1_bm, ylab="Residuals", xlab="
 gqtest(modelOLSfin_bm) #heteroskedasticity
 bptest(modelOLSfin_bm) #heteroskedasticity 
 ```
-
-```{Robuts SEs}
-#Use robust SEs
+>##### Use robust SEs
+```{r}
 coeftest(modelOLSfin_bm, vcov = vcovHC(modelOLSfin_bm, "HC1"))
-s
-#OLS RESULTS: Change in policy decreases return dollar amount by 36.62%
-
+```
+>#### OLS RESULTS: Change in policy decreases return dollar amount by 36.62%
 plot(effect(term="post_policy*study_group",mod=modelOLSfin_bm,xlevel=2),multiline=TRUE)
 ```
 
 ```{r}
-#Although the interaction term coefficient from the data set with both study group and control group is the final result (because the difference between the study group and control group is the effect of the policy change),   we isolate the groups to check if each policy change beta is significant in case there was specification errors in the OLS model.
+>#### Although the interaction term coefficient from the data set with both study group and control group is the final result (because the difference between the study group and control group is the effect of the policy change),   we isolate the groups to check if each policy change beta is significant in case there was specification errors in the OLS model.
+
+```{r}
 sg<-subset(bms_returns, bms_returns$study_group==1)
 
 modelOLSfin_bm_sg<-lm(log(return_amt+1)~post_policy+log(monthly_sales_cnt+1)+log(sa_avg_years_of_exp+1)+sa_avg_rate_of_pay+avg_income_code+avg_age_band, data=sg)
@@ -194,9 +195,9 @@ summary(modelOLSfin_bm_cg)
 plot(effect(term="post_policy",mod=modelOLSfin_bm_sg,xlevel=2),more = TRUE)
 
 plot(effect(term="post_policy",mod=modelOLSfin_bm_cg,xlevel=2),more=TRUE)
-#Magnitude of interaction term beta seems a bit high. Sales amount is endogenous due to simultaneity and possibly OV as well - perhaps other store attributes can serve as IVs. 
 ```
-
+>#### Magnitude of interaction term beta seems a bit high. Sales amount is endogenous due to simultaneity and possibly OV as well - perhaps other store attributes can serve as IVs. 
+```
 
 ```{r}
 #IV Variable Assessment}
