@@ -3,9 +3,9 @@ title: "Return_Policy_Effect_BMS"
 author: Greg Murray
 ---
 
-&#8195;# Policy change impact on bms returns.
->#### Dependent variable: *return_amt*; 
->#### Key independent variables: *post_policy*, *study_group*, *post_policy\*studygroup* 
+# Policy change impact on bms returns.
+>### Dependent variable: *return_amt*; 
+>### Key independent variables: *post_policy*, *study_group*, *post_policy\*studygroup* 
 
 ### Libraries and Dependencies
 ```{r}
