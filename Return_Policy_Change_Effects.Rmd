@@ -248,7 +248,7 @@ rexp.est
 ```
 >#### Beta for post_policy is insignicant, therefore without a control group there is no way to isolate the policy change effect in the study group.
 
->##**FINAL CONCLUSION:** policy change likely has no effect on returns in online channel
+>## **FINAL CONCLUSION:** policy change likely has no effect on returns in online channel
 
 
 #______________________________________________________________________________________________________________________#
