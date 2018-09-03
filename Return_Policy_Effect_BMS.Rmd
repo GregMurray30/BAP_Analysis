@@ -172,8 +172,9 @@ bptest(modelOLSfin_bm) #heteroskedasticity
 ```{r}
 coeftest(modelOLSfin_bm, vcov = vcovHC(modelOLSfin_bm, "HC1"))
 ```
->#### OLS RESULTS: Change in policy decreases return dollar amount by 36.62%
+>### **OLS RESULTS: Change in policy decreases return dollar amount by 36.62%**
 
+#### Plot effect of return policy on returns for study group vs control group
 ```{r}
 plot(effect(term="post_policy*study_group",mod=modelOLSfin_bm,xlevel=2),multiline=TRUE)
 ```
