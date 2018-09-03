@@ -178,7 +178,7 @@ coeftest(modelOLSfin_bm, vcov = vcovHC(modelOLSfin_bm, "HC1"))
 ```{r}
 plot(effect(term="post_policy*study_group",mod=modelOLSfin_bm,xlevel=2),multiline=TRUE)
 ```
->#### Although the interaction term coefficient from the data set with both study group and control group is the final result (because the difference between the study group and control group is the effect of the policy change),   we isolate the groups to check if each policy change beta is significant in case there was specification errors in the OLS model.
+>##### Although the interaction term coefficient from the data set with both study group and control group is the final result (because the difference between the study group and control group is the effect of the policy change),   we isolate the groups to check if each policy change beta is significant in case there was specification errors in the OLS model.
 
 ```{r}
 sg<-subset(bms_returns, bms_returns$study_group==1)
@@ -193,7 +193,7 @@ summary(modelOLSfin_bm_cg)
 
 plot(effect(term="post_policy",mod=modelOLSfin_bm_sg,xlevel=2),more = TRUE)
 ```
->#### Magnitude of interaction term beta seems a bit high. Sales amount is endogenous due to simultaneity and possibly OV as well - perhaps other store attributes can serve as IVs. 
+>##### Magnitude of interaction term beta seems a bit high. Sales amount is endogenous due to simultaneity and possibly OV as well - perhaps other store attributes can serve as IVs. 
 
 #### IV Variable Assessment
 ```{r}
