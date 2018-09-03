@@ -55,9 +55,11 @@ sg<-subset(onl_returns, study_group==1)
 cg<-subset(onl_returns, study_group==0)
 boxplot(log(sg$return_amt+1)~sg$post_policy,xlab="post_policy (study group)")
 ```
->#### Returns go down after policy change in the study group (sans regression modelling)
-boxplot(log(cg$return_amt+1)~cg$post_policy,xlab="post_policy (control group")
+>##### Returns go down after policy change in the study group (sans regression modelling)
 
+```{r}
+boxplot(log(cg$return_amt+1)~cg$post_policy,xlab="post_policy (control group")
+```
 >##### Returns go down up slightly after policy change in the control group (sans regression modelling)
 
 ```{r}
@@ -73,7 +75,8 @@ boxplot(log(onl_returns$return_amt+1)~onl_returns$avg_income_code, xlab="avg inc
 boxplot(log(onl_returns$return_amt+1)~onl_returns$avg_age_band, xlab="avg age band")
 boxplot(log(onl_returns$return_amt+1)~onl_returns$, xlab="avg income code")
 ```
->### Stepwise Control Variable Selection
+
+>#### Stepwise Control Variable Selection
 ```{r}
 OLSModel<-lm(log(return_amt+1)~post_policy+study_group+log(daily_sales_amt+1)+log(store_average_price+1)+log(store_number_of_skus+1)+sales_volume_group+avg_income_code+log(homeowner_ratio+1)+child_ratio+avg_age_band+cust_gender+post_policy*study_group, data=onl_returns)
 
@@ -84,7 +87,7 @@ model_step<-lm(log(return_amt+1)~post_policy+study_group+log(daily_sales_amt+1)+
 ```
 >##### Ignore recommendations
 
->### Check for Multicollinearity
+>#### Check for Multicollinearity
 ```{r}
 df<-data.frame(onl_returns$post_policy, onl_returns$study_group, log(onl_returns$daily_sales_amt+1), onl_returns$store_average_price, onl_returns$store_number_of_skus, onl_returns$sales_volume_group, onl_returns$avg_income_code, log(onl_returns$homeowner_ratio+1),onl_returns$child_ratio, onl_returns$avg_age_band, onl_returns$cust_gender)
 m1_onl<-as.matrix(cor(df))
@@ -131,7 +134,7 @@ bptest(modelOLSfin_onl) #heteroskedasticity
 cov.modelOLSfin_onl<- vcovHC(modelOLSfin_onl, type="HC1")
 ```
 
-### **OLS MODEL CONCLUSION:** Insignificant interaction term, policy change has no effect on returns for online channel
+#### **OLS MODEL CONCLUSION:** Insignificant interaction term, policy change has no effect on returns for online channel
 
 >### 2SLS Model Approach
 ```{r}
@@ -144,7 +147,7 @@ df4_onl<-data.frame(log(onl_returns$return_amt+1),log(onl_returns$daily_sales_am
 m4_onl<-as.matrix(cor(df4_onl))
 ```
 
->####Try sales_volume group and store_number_of_skus as IVs for daily_sales_amount
+>#### Try sales_volume group and store_number_of_skus as IVs for daily_sales_amount
 ```{r}
 ivregmodel_onl<-ivreg(log(return_amt+1)~post_policy+study_group+log(daily_sales_amt+1)+avg_income_code+avg_age_band+post_policy*study_group|sales_volume_group+store_number_of_skus+post_policy+study_group+avg_income_code+avg_age_band+post_policy*study_group, data=onl_returns)
 summary(ivregmodel_onl,diagnostics = TRUE)
