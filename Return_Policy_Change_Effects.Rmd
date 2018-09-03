@@ -3,12 +3,11 @@ title: "Return Policy Change Effects"
 author: Greg Murray
 ---
 
-#Analyis 1: Policy change impact on online returns.
+>## Analyis 1: Policy change impact on online returns.
 #dependent variable=return_amt; key independent variables=post_policy,study_group, post_policy*studygroup 
 
+>### Libraries and Dependencies
 ```{r}
-#Library Packages
-
 library(QuantPsyc)
 library(effects)
 library(MASS)
@@ -23,20 +22,15 @@ library(VIF)
 library(msm)
 ```
 
-
+>### Data Initialization
 ```{r}
-#Data Initialization
-
 setwd('c:/users/greg/r_projects/bus_analytics_project')
 onl_returns<-read.csv('onl_store_data2.csv')
 summary(onl_returns)
 onl_returns<-na.omit(onl_returns)
 ```
-
-
+>### Raw Data Analysis
 ```{r}
-#Raw Data Analysis
-
 hist(onl_returns$return_amt)
 hist(log(onl_returns$return_amt+1))#
 hist(log(onl_returns$daily_sales_amt+1))
@@ -60,10 +54,13 @@ hist(log(onl_returns$child_ratio+1))
 sg<-subset(onl_returns, study_group==1)
 cg<-subset(onl_returns, study_group==0)
 boxplot(log(sg$return_amt+1)~sg$post_policy,xlab="post_policy (study group)")
-#Returns go down after policy change in the study group (sans regression modelling)
+```
+>#### Returns go down after policy change in the study group (sans regression modelling)
 boxplot(log(cg$return_amt+1)~cg$post_policy,xlab="post_policy (control group")
-#Returns go down up slightly after policy change in the control group (sans regression modelling)
 
+>##### Returns go down up slightly after policy change in the control group (sans regression modelling)
+
+```{r}
 plot(log(onl_returns$daily_sales_amt+1), log(onl_returns$return_amt+1))
 plot(log(onl_returns$daily_sales_cntt+1), log(onl_returns$return_amt+1))
 plot(onl_returns$store_average_price, log(onl_returns$return_amt+1))
@@ -76,20 +73,19 @@ boxplot(log(onl_returns$return_amt+1)~onl_returns$avg_income_code, xlab="avg inc
 boxplot(log(onl_returns$return_amt+1)~onl_returns$avg_age_band, xlab="avg age band")
 boxplot(log(onl_returns$return_amt+1)~onl_returns$, xlab="avg income code")
 ```
-
+>### Stepwise Control Variable Selection
 ```{r}
-#Stepwise Control Variable Selection
 OLSModel<-lm(log(return_amt+1)~post_policy+study_group+log(daily_sales_amt+1)+log(store_average_price+1)+log(store_number_of_skus+1)+sales_volume_group+avg_income_code+log(homeowner_ratio+1)+child_ratio+avg_age_band+cust_gender+post_policy*study_group, data=onl_returns)
 
 step<-stepAIC(OLSModel, direction="both") #choose vars
 step$anova
 
 model_step<-lm(log(return_amt+1)~post_policy+study_group+log(daily_sales_amt+1)+store_average_price+log(store_number_of_skus+1)+sales_volume_group+log(homeowner_ratio+1)+avg_income_code+avg_age_band+cust_gender+post_policy*study_group, data=onl_returns)
-#Ignore recommendations
 ```
+>##### Ignore recommendations
 
+>###Check for Multicollinearity
 ```{r}
-#Check for Multicollinearity
 df<-data.frame(onl_returns$post_policy, onl_returns$study_group, log(onl_returns$daily_sales_amt+1), onl_returns$store_average_price, onl_returns$store_number_of_skus, onl_returns$sales_volume_group, onl_returns$avg_income_code, log(onl_returns$homeowner_ratio+1),onl_returns$child_ratio, onl_returns$avg_age_band, onl_returns$cust_gender)
 m1_onl<-as.matrix(cor(df))
 View(m1_onl)
@@ -102,11 +98,11 @@ df2_onl<-data.frame(onl_returns$post_policy, onl_returns$study_group, log(onl_re
 m2_onl<-as.matrix(cor(df2_onl))
 View(m2_onl)
 vif(df2)
-# No dangerous multi-collinearity
 ```
+>##### No dangerous multi-collinearity
 
+>### OLS: Design and Refine Models
 ```{r}
-#OLS: Design and Refine Models
 model1_onl<-lm(log(return_amt+1)~post_policy+study_group+log(daily_sales_amt+1)+avg_income_code+avg_age_band+post_policy*study_group, data=onl_returns)
 summary(model1_onl)
 #insignificant interaction beta - as expected
@@ -120,9 +116,8 @@ anova(model1_onl, model2_onl, test="Chisq")
 modelOLSfin_onl<-model1_onl
 ```
 
-
+>###Heteroscedasticity Testing
 ```{r}
-#Heteroscedasticity Testing
 residual1=resid(modelOLSfin_onl)
 qqnorm(residual1)
 qqline(residual1, col=1) 
@@ -131,18 +126,15 @@ plot(log(onl_returns$daily_sales_amt+1),residual1, ylab="Residuals", xlab="daily
 gqtest(modelOLSfin_onl) #no heteroskedasticity
 bptest(modelOLSfin_onl) #heteroskedasticity 
 ```
-
+>##### Use robust SEs
 ```{r}
-#Robust SEs
 cov.modelOLSfin_onl<- vcovHC(modelOLSfin_onl, type="HC1")
-
-
-#***OLS MODEL CONCLUSION: Insignificant interaction term, policy change has no effect on returns for online channel
 ```
 
-```{r}
-#2SLS Model Approach
+###**OLS MODEL CONCLUSION:** Insignificant interaction term, policy change has no effect on returns for online channel
 
+>### 2SLS Model Approach
+```{r}
 df3_onl<-data.frame(log(onl_returns$return_amt+1),log(onl_returns$daily_sales_amt+1),onl_returns$store_average_price,onl_returns$store_number_of_skus, onl_returns$sales_volume_group,onl_returns$avg_length_residence, onl_returns$post_policy, onl_returns$study_group,onl_returns$avg_income_code, onl_returns$avg_age_band)
 m3_onl<-as.matrix(cor(df3_onl))
 mean(m3_onl)
@@ -150,28 +142,30 @@ View(m3_onl)
 
 df4_onl<-data.frame(log(onl_returns$return_amt+1),log(onl_returns$daily_sales_amt+1),onl_returns$store_number_of_skus, onl_returns$sales_volume_group,onl_returns$avg_length_residence,onl_returns$child_ratio, onl_returns$post_policy, onl_returns$study_group,onl_returns$avg_income_code, onl_returns$avg_age_band)
 m4_onl<-as.matrix(cor(df4_onl))
-mean(m34_onl)
-View(m4_onl)
+```
 
-#Try sales_volume group and store_number_of_skus as IVs for daily_sales_amount
-
+>####Try sales_volume group and store_number_of_skus as IVs for daily_sales_amount
+```{r}
 ivregmodel_onl<-ivreg(log(return_amt+1)~post_policy+study_group+log(daily_sales_amt+1)+avg_income_code+avg_age_band+post_policy*study_group|sales_volume_group+store_number_of_skus+post_policy+study_group+avg_income_code+avg_age_band+post_policy*study_group, data=onl_returns)
 summary(ivregmodel_onl,diagnostics = TRUE)
 #With F-statistic signficant the IVs relevance assumption holds, Sargan insigificant the exogeneity assumption holds but Wu-Hausman insignificant means there was no endogeneity in the OLS model
 ```
 
+##RETURN_CNT Models 
+>### Poisson Model
 ```{r}
-#RETURN_CNT Models 
 colnames(onl_returns)[11]<-"return_cnt"
-#Poisson Model
+
 summary(poisson1<-glm((return_cnt+1)~post_policy+study_group+log(daily_sales_cnt+1)+avg_income_code+avg_age_band+post_policy*study_group, family="poisson", data=onl_returns))
 
 with(poisson1, null.deviance - deviance)
 with(poisson1, df.null - df.residual)
 with(poisson1, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
-#Significant so Poisson fails
+```
+>#####Significant so Poisson fails
 
-
+>### Negative Binomial Model
+```{r}
 marg_means<-data.frame(post_policy=seq(0,1), study_group=seq(0,1), avg_income_code=mean(onl_returns$avg_income_code),avg_age_band=mean(onl_returns$avg_age_band),daily_sales_cnt=mean(log(onl_returns$daily_sales_cnt+1)))
 
 predict(poisson1, marg_means, type="response", se.fit=TRUE)
@@ -179,8 +173,8 @@ predict(poisson1, marg_means, type="response", se.fit=TRUE)
 summary(negbin1_ol<-glm.nb((return_cnt+1)~post_policy+study_group+log(daily_sales_cnt+1)+avg_age_band+avg_income_code+avg_age_band+post_policy*study_group, data=onl_returns))
 ```
 
+>####Heteroscedasticity
 ```{r}
-#Heteroscedasticity
 residual3=resid(negbin1_ol)
 plot(log(onl_returns$daily_sales_cnt+1),residual3, ylab="Residuals", xlab="daily_sales_cnt") # As the residual plot indicates, we have possible heteroskedasticity
 qqnorm(residual3)
@@ -197,8 +191,8 @@ X2
 pchisq(X2, df = 1, lower.tail=FALSE) # Negative Binomial over Poisson
 ```
 
+>#### Robust SEs
 ```{r}
-#Robust SEs
 coeftest(negbin1_ol, vcov = vcovHC(negbin1_ol, "HC1"))
 
 cov.negbin1_ol <- vcovHC(negbin1_ol, type="HC1")
@@ -213,23 +207,28 @@ rexp.est[, "Robust SE"] <- s # replace SEs with estimates for exponentiated coef
 rexp.est 
 
 plot(effect(term="post_policy*study_group",mod=negbin1_ol,xlevel=2),multiline=TRUE)
-#***NEGBIN CONCLUSION: Interaction term is insignificant - policy change likely has no effect on returns in online channel
 ```
+###**NEGBIN CONCLUSION:** Interaction term is insignificant - policy change likely has no effect on returns in online channel
 
+>###Control Group Isolation
 ```{r}
-#Control Group Isolation}
+
 control_group<-subset(onl_returns, study_group==0)
 summary(onl_returns)
 summary(negbin_cg<-glm.nb((return_cnt+1)~post_policy+log(daily_sales_cnt+1)+avg_income_code+avg_age_band, data=control_group))
-#Control group beta is insignificant
+```
+>#####Control group coeffecient is insignificant
 
+>####Heteroscedasticity
+```{r}
 residual4=resid(negbin_cg)
 qqnorm(residual4)
 qqline(residual4, col=1)
 gqtest(negbin_cg) #no hetero
 bptest(negbin_cg)#hetero
-
-#use robust SE
+```
+>##### use robust SE
+```{r}
 coeftest(negbin_cg, vcov = vcovHC(negbin_cg, "HC1"))
 
 cov.negbin_cg <- vcovHC(negbin_cg, type="HC1")
@@ -242,10 +241,10 @@ UL = coef(negbin_cg) + 1.96 * std.err)
 rexp.est <- exp(r.est[, -3]) # exponentiate old estimates dropping the p values
 rexp.est[, "Robust SE"] <- s # replace SEs with estimates for exponentiated coefficients
 rexp.est 
- #Beta for post_policy is insignicant, therefore without a control group there is no way to isolate the policy change effect in the study group.
-
-#*** FINAL CONCLUSION: policy change likely has no effect on returns in online channel
 ```
+>#### Beta for post_policy is insignicant, therefore without a control group there is no way to isolate the policy change effect in the study group.
+
+##**FINAL CONCLUSION:** policy change likely has no effect on returns in online channel
 
 
 #______________________________________________________________________________________________________________________#
