@@ -1,9 +1,9 @@
 ---
-title: "Return_Policy_Effect_BMS"
+title: "Return Policy Effect on Returns for BMS"
 author: Greg Murray
 ---
 
-# Policy change impact on bms returns.
+# Policy Change Impact on Brick & Mortar Store Returns.
 >### Dependent variable: *return_amt* 
 >### Key independent variables: *post_policy*, *study_group*, *post_policy\*studygroup* 
 
