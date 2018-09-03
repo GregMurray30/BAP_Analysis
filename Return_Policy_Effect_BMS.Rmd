@@ -212,9 +212,9 @@ View(m6_bm)
 >##### No possible IV candidates 
 
 ### RETURN_CNT Models 
-####Try changing the dependent variable to log return count and using Poisson/Negative Binomial
+>#### Try changing the dependent variable to log return count and using Poisson/Negative Binomial
+### Poisson Model
 ```{r}
-#Sales Cnt
 summary(poisson1_bm<-glm((return_cnt+1)~post_policy+study_group+log(monthly_sales_cnt+1)+log(sa_avg_years_of_exp+1)+sa_avg_rate_of_pay+avg_age_band+avg_income_code+post_policy*study_group, family="poisson", data=bms_returns))
 
 residual2_bm=resid(poisson1_bm)
@@ -225,16 +225,19 @@ qqline(residual2_bm, col=1)
 with(poisson1_bm, null.deviance - deviance)
 with(poisson1_bm, df.null - df.residual)
 with(poisson1_bm, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
-#Significant so Poisson fails
+```
+>##### Significant so Poisson fails
 
+```{r}
 marg_means1_bm<-data.frame(post_policy=seq(0,1), study_group=seq(0,1),monthly_sales_cnt=mean(log(bms_returns$monthly_sales_cnt+1)),sa_avg_rate_of_pay=mean(bms_returns$sa_avg_rate_of_pay),avg_age_band=mean(bms_returns$avg_age_band), sa_avg_years_of_exp=mean(log(bms_returns$sa_avg_years_of_exp+1)), avg_income_code=mean(bms_returns$avg_income_code))
-
-
-#Negative Binomial Model
+```
+### Negative Binomial Model
+```{r}
 summary(negbin1_bm<-glm.nb((return_cnt+1)~post_policy+study_group+log(monthly_sales_cnt+1)+sa_avg_rate_of_pay+avg_age_band+avg_income_code+log(sa_avg_years_of_exp+1)+post_policy*study_group, data=bms_returns))
 exp(coef(negbin1_bm))
-
-#Compare to Poisson model
+```
+#### Compare NegBin and Poisson model
+```{r}
 with(negbin1_bm, null.deviance - deviance)
 with(negbin1_bm, df.null - df.residual)
 with(negbin1_bm, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
@@ -243,10 +246,8 @@ X2
 pchisq(X2, df = 1, lower.tail=FALSE) # Significant Likelihood Ratio Test: Negative Binomial over Poisson
 ```
 
+#### Heteroscedasticity
 ```{r}
-#Negbin1 Analysis
-
-#Check for hetero
 residual4_bm=resid(negbin1_bm)
 plot(log(bms_returns$monthly_sales_cnt+1),residual4_bm, ylab="Residuals", xlab="monthly_sales_cnt") # As the residual plot indicates, we have possible heteroskedasticity
 qqnorm(residual4_bm)
@@ -254,10 +255,9 @@ qqline(residual4_bm,col=1)
 gqtest(negbin1_bm) #heteroscedasticity
 bptest(negbin1_bm) #heteroscedasticity
 ```
+>##### Use robust SEs
 
 ```{r}
-
-# Robust SEs
 coeftest(negbin1_bm, vcov = vcovHC(negbin1_bm, "HC1")) #interaction term still significant
 
 cov.negbin1_bm <- vcovHC(negbin1_bm, type="HC1")
@@ -270,18 +270,23 @@ UL = coef(negbin1_bm) + 1.96 * std.err)
 rexp.est <- exp(r.est[, -3])-1 # exponentiate old estimates dropping the p values. minus 1 to see as difference not a factor
 rexp.est[, "Robust SE"] <- s # replace SEs with estimates for exponentiated coefficients
 rexp.est
-#***NEGBIN MODEL CONCLUSION: Policy change decreases number of returns by 25.86%
+```
+>### **NEGBIN MODEL CONCLUSION: Policy change decreases number of returns by 25.86%
 
+#### Plot effect of the policy change in the study group
+```{r}
 plot(effect(term="post_policy*study_group",mod=negbin1_bm,xlevel=2),multiline=TRUE)
 ```
 
+### Control Group Isolation
 ```{r}
-#Control Group Isolation}
 bms_returns_cg<-subset(bms_returns, study_group==0)
 
 summary(negbin_cg<-glm.nb((return_cnt+1)~post_policy+log(monthly_sales_cnt+1)+sa_avg_rate_of_pay+avg_age_band+avg_income_code+log(avg_length_residence+1), data=bms_returns_cg))
+```
 
-#use robust SE:
+#### Robust SE:
+```{r}
 coeftest(negbin_cg, vcov = vcovHC(negbin_cg, "HC1")) #post_policy still significant
 
 cov.negbin_cg <- vcovHC(negbin_cg, type="HC1")
@@ -294,18 +299,21 @@ UL = coef(negbin_cg) + 1.96 * std.err)
 rexp.est <- exp(r.est[, -3])-1 # exponentiate old estimates dropping the p values
 rexp.est[, "Robust SE"] <- s # replace SEs with estimates for exponentiated coefficients
 rexp.est
-#demonstrate IRRs. The output indicates an increase in returns (due to environmental control factors) of 19.02% in the control group
+```
+>##### demonstrate IRRs. The output indicates an increase in returns (due to environmental control factors) of 19.02% in the control group
 
+```{r}
 plot(effect(term="post_policy",mod=negbin_cg,xlevel=2),multiline=TRUE)
 ```
 
+### Study Group Isolation
 ```{r}
-#Study Group Isolation}
 bms_returns_sg<-subset(bms_returns, study_group==1)
 
 summary(negbin_sg<-glm.nb((return_cnt+1)~post_policy+log(monthly_sales_cnt+1)+sa_avg_rate_of_pay+avg_age_band+avg_income_code+log(avg_length_residence+1), data=bms_returns_sg))
-
-#use robust SE:
+```
+#### Robust SE:
+```{r}
 coeftest(negbin_sg, vcov = vcovHC(negbin_sg, "HC1")) #post_policy still significant
 
 cov.negbin_sg <- vcovHC(negbin_sg, type="HC1")
@@ -318,9 +326,11 @@ UL = coef(negbin_sg) + 1.96 * std.err)
 rexp.est <- exp(r.est[, -3])-1 # exponentiate old estimates dropping the p values
 rexp.est[, "Robust SE"] <- s # replace SEs with estimates for exponentiated coefficients
 rexp.est
-#demonstrate IRRs. The output  indicates that policy change in the study group decreases returns by 11.17% 
-plot(effect(term="post_policy",mod=negbin_sg,xlevel=2),multiline=TRUE)
-
-
-#***Q4 FINAL CONCLUSION: Policy change leads to 25.86% decrease in the number of returns and a 36.62% decrease in the return dollar amount for bms channel
 ```
+>##### demonstrate IRRs. The output  indicates that policy change in the study group decreases returns by 11.17% 
+```{r}
+plot(effect(term="post_policy",mod=negbin_sg,xlevel=2),multiline=TRUE)
+```
+
+>##**Q4 FINAL CONCLUSION: Policy change leads to 25.86% decrease in the number of returns and a 36.62% decrease in the return dollar amount for bms channel**
+
