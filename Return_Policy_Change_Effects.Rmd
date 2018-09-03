@@ -6,7 +6,7 @@ author: Greg Murray
 >## Analyis 1: Policy change impact on online returns.
 #dependent variable=return_amt; key independent variables=post_policy,study_group, post_policy*studygroup 
 
->### Libraries and Dependencies
+### Libraries and Dependencies
 ```{r}
 library(QuantPsyc)
 library(effects)
@@ -51,18 +51,18 @@ hist(onl_returns$child_ratio) #
 hist(log(onl_returns$child_ratio+1))
 ```
 
->#### Raw data plots with dependent var
+#### Raw data plots with dependent var
 ```{r}
 sg<-subset(onl_returns, study_group==1)
 cg<-subset(onl_returns, study_group==0)
 boxplot(log(sg$return_amt+1)~sg$post_policy,xlab="post_policy (study group)")
 ```
-##### Returns go down after policy change in the study group (sans regression modelling)
+>##### Returns go down after policy change in the study group (sans regression modelling)
 
 ```{r}
 boxplot(log(cg$return_amt+1)~cg$post_policy,xlab="post_policy (control group")
 ```
-##### Returns go down up slightly after policy change in the control group (sans regression modelling)
+>##### Returns go down up slightly after policy change in the control group (sans regression modelling)
 
 ```{r}
 plot(log(onl_returns$daily_sales_amt+1), log(onl_returns$return_amt+1))
@@ -78,7 +78,7 @@ boxplot(log(onl_returns$return_amt+1)~onl_returns$avg_age_band, xlab="avg age ba
 boxplot(log(onl_returns$return_amt+1)~onl_returns$, xlab="avg income code")
 ```
 
->#### Stepwise Control Variable Selection
+#### Stepwise Control Variable Selection
 ```{r}
 OLSModel<-lm(log(return_amt+1)~post_policy+study_group+log(daily_sales_amt+1)+log(store_average_price+1)+log(store_number_of_skus+1)+sales_volume_group+avg_income_code+log(homeowner_ratio+1)+child_ratio+avg_age_band+cust_gender+post_policy*study_group, data=onl_returns)
 
