@@ -6,6 +6,8 @@ author: Greg Murray
 # Policy Change Impact on Brick & Mortar Store Returns.
 >### Dependent variable: *return_amt* 
 >### Key independent variables: *post_policy*, *study_group*, *post_policy\*studygroup* 
+>### [Final Model](#Final-Model)
+>### [FInal Conclusion](#FINAL-CONCLUSION)
 
 ### Libraries and Dependencies
 ```{r}
@@ -241,10 +243,15 @@ with(negbin1_bm, df.null - df.residual)
 with(negbin1_bm, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
 X2 <- 2 * (logLik(negbin1_bm) - logLik(poisson1_bm))
 X2
-pchisq(X2, df = 1, lower.tail=FALSE) # Significant Likelihood Ratio Test: Negative Binomial over Poisson
+pchisq(X2, df = 1, lower.tail=FALSE) 
 ```
-
+>##### Significant Likelihood Ratio Test: Negative Binomial over Poisson
+#### Final Model
+```{r} 
+negbin1_bm<-glm.nb((return_cnt+1)~post_policy+study_group+log(monthly_sales_cnt+1)+sa_avg_rate_of_pay+avg_age_band+avg_income_code+log(sa_avg_years_of_exp+1)+post_policy*study_group, data=bms_returns))
+```
 #### Heteroscedasticity
+
 ```{r}
 residual4_bm=resid(negbin1_bm)
 plot(log(bms_returns$monthly_sales_cnt+1),residual4_bm, ylab="Residuals", xlab="monthly_sales_cnt") # As the residual plot indicates, we have possible heteroskedasticity
@@ -330,5 +337,6 @@ rexp.est
 plot(effect(term="post_policy",mod=negbin_sg,xlevel=2),multiline=TRUE)
 ```
 
->## **FINAL CONCLUSION: Policy change leads to 25.86% decrease in the number of returns and a 36.62% decrease in the return dollar amount for bms channel**
+>## **FINAL CONCLUSION:**
+>## **Policy change leads to 25.86% decrease in the number of returns and a 36.62% decrease in the return dollar amount for bms channel**
 
