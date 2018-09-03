@@ -26,15 +26,13 @@ library(msm)
 ```{r}
 setwd('c:/users/greg/r_projects/bus_analytics_project')
 bms_returns<-read.csv('bms_return_data3.csv')
-summary(bms_returns)
+
 bms_returns$return_amt[is.na(bms_returns$return_amt)]<-0
 bms_returns<-na.omit(bms_returns)
 
 colnames(bms_returns)[1]<-"store_number"
 
 BMS_RETURNS_BACKUP<-bms_returns
-
-bms_returns<-BMS_RETURNS_BACKUP
 ```
 ### Raw Data Analysis
 ```{r}
