@@ -175,10 +175,10 @@ bptest(modelOLSfin_bm) #heteroskedasticity
 coeftest(modelOLSfin_bm, vcov = vcovHC(modelOLSfin_bm, "HC1"))
 ```
 >#### OLS RESULTS: Change in policy decreases return dollar amount by 36.62%
-plot(effect(term="post_policy*study_group",mod=modelOLSfin_bm,xlevel=2),multiline=TRUE)
-```
 
 ```{r}
+plot(effect(term="post_policy*study_group",mod=modelOLSfin_bm,xlevel=2),multiline=TRUE)
+```
 >#### Although the interaction term coefficient from the data set with both study group and control group is the final result (because the difference between the study group and control group is the effect of the policy change),   we isolate the groups to check if each policy change beta is significant in case there was specification errors in the OLS model.
 
 ```{r}
@@ -197,11 +197,9 @@ plot(effect(term="post_policy",mod=modelOLSfin_bm_sg,xlevel=2),more = TRUE)
 plot(effect(term="post_policy",mod=modelOLSfin_bm_cg,xlevel=2),more=TRUE)
 ```
 >#### Magnitude of interaction term beta seems a bit high. Sales amount is endogenous due to simultaneity and possibly OV as well - perhaps other store attributes can serve as IVs. 
-```
 
+### IV Variable Assessment
 ```{r}
-#IV Variable Assessment}
-
 df5_bm<-data.frame(log(bms_returns$return_amt+1),log(bms_returns$monthly_sales_amt+1),bms_returns$sa_married,bms_returns$sa_full_time, bms_returns$sa_dependent, bms_returns$post_policy, bms_returns$study_group,bms_returns$sa_gender,bms_returns$sa_avg_rate_of_pay,+log(bms_returns$sa_avg_years_of_exp+1),bms_returns$avg_income_code,bms_returns$avg_age_band,bms_returns$homeowner_ratio)
 m5_bm<-as.matrix(cor(df5_bm))
 View(m5_bm)
@@ -210,13 +208,12 @@ df6_bm<-data.frame(log(bms_returns$return_amt+1),log(bms_returns$monthly_sales_c
 m6_bm<-as.matrix(cor(df6_bm))
 mean(m6_bm)
 View(m6_bm)
-#No possible IV candidates 
 ```
+>##### No possible IV candidates 
 
-
+### RETURN_CNT Models 
+####Try changing the dependent variable to log return count and using Poisson/Negative Binomial
 ```{r}
-#RETURN_CNT Models 
-#Try changing the dependent variable to log return count and using Poisson/Negative Binomial
 #Sales Cnt
 summary(poisson1_bm<-glm((return_cnt+1)~post_policy+study_group+log(monthly_sales_cnt+1)+log(sa_avg_years_of_exp+1)+sa_avg_rate_of_pay+avg_age_band+avg_income_code+post_policy*study_group, family="poisson", data=bms_returns))
 
