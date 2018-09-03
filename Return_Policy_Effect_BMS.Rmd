@@ -4,7 +4,7 @@ author: Greg Murray
 ---
 
 # Policy change impact on bms returns.
->### Dependent variable: *return_amt*; 
+>### Dependent variable: *return_amt* 
 >### Key independent variables: *post_policy*, *study_group*, *post_policy\*studygroup* 
 
 ### Libraries and Dependencies
@@ -160,7 +160,7 @@ summary(pred)
 ```
 >##### All positive pred values - good
 
-### Heteroscedasticity Testing
+#### Heteroscedasticity Testing
 ```{r}
 residual1_bm=resid(modelOLSfin_bm)
 plot(residual1_bm, ylab="Residuals", xlab="all vars") 
@@ -193,12 +193,10 @@ modelOLSfin_bm_cg<-lm(log(return_amt+1)~post_policy+log(monthly_sales_cnt+1)+log
 summary(modelOLSfin_bm_cg)
 
 plot(effect(term="post_policy",mod=modelOLSfin_bm_sg,xlevel=2),more = TRUE)
-
-plot(effect(term="post_policy",mod=modelOLSfin_bm_cg,xlevel=2),more=TRUE)
 ```
 >#### Magnitude of interaction term beta seems a bit high. Sales amount is endogenous due to simultaneity and possibly OV as well - perhaps other store attributes can serve as IVs. 
 
-### IV Variable Assessment
+#### IV Variable Assessment
 ```{r}
 df5_bm<-data.frame(log(bms_returns$return_amt+1),log(bms_returns$monthly_sales_amt+1),bms_returns$sa_married,bms_returns$sa_full_time, bms_returns$sa_dependent, bms_returns$post_policy, bms_returns$study_group,bms_returns$sa_gender,bms_returns$sa_avg_rate_of_pay,+log(bms_returns$sa_avg_years_of_exp+1),bms_returns$avg_income_code,bms_returns$avg_age_band,bms_returns$homeowner_ratio)
 m5_bm<-as.matrix(cor(df5_bm))
@@ -213,6 +211,7 @@ View(m6_bm)
 
 ### RETURN_CNT Models 
 >#### Try changing the dependent variable to log return count and using Poisson/Negative Binomial
+
 ### Poisson Model
 ```{r}
 summary(poisson1_bm<-glm((return_cnt+1)~post_policy+study_group+log(monthly_sales_cnt+1)+log(sa_avg_years_of_exp+1)+sa_avg_rate_of_pay+avg_age_band+avg_income_code+post_policy*study_group, family="poisson", data=bms_returns))
@@ -332,5 +331,5 @@ rexp.est
 plot(effect(term="post_policy",mod=negbin_sg,xlevel=2),multiline=TRUE)
 ```
 
->## **Q4 FINAL CONCLUSION: Policy change leads to 25.86% decrease in the number of returns and a 36.62% decrease in the return dollar amount for bms channel**
+>## **FINAL CONCLUSION: Policy change leads to 25.86% decrease in the number of returns and a 36.62% decrease in the return dollar amount for bms channel**
 
