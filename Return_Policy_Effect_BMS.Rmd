@@ -6,9 +6,24 @@ author: Greg Murray
 
 # Policy change impact on bms returns.
 #Model 0 OLS; dependent variable=return_amt; key independent variables=post_policy,study_group, #post_policy*studygroup 
-```{r}
-#Data Initialization}
 
+### Libraries and Dependencies
+```{r}
+library(QuantPsyc)
+library(effects)
+library(MASS)
+library(usdm)
+library(lmtest)
+library(AER)
+library(foreign)
+library(aod)
+library(ggplot2)
+library(sandwich)
+library(VIF)
+library(msm)
+```
+### Data Initialization
+```{r}
 setwd('c:/users/greg/r_projects/bus_analytics_project')
 bms_returns<-read.csv('bms_return_data3.csv')
 summary(bms_returns)
@@ -21,9 +36,8 @@ BMS_RETURNS_BACKUP<-bms_returns
 
 bms_returns<-BMS_RETURNS_BACKUP
 ```
-
+### Raw Data Analysis
 ```{r}
-#Data inspection
 summary(bms_returns)
 
 hist(bms_returns$return_amt)
@@ -44,17 +58,24 @@ hist(bms_returns$homeowner_ratio)
 hist(log(bms_returns$homeowner_ratio+1))#
 hist(bms_returns$child_ratio) #
 hist(log(bms_returns$child_ratio+1))
-# Raw data plots with dependent var
-boxplot(bms_returns$return_amt~bms_returns$study_group, xlab="study group") 
-# Returns slightly higher for study group in raw data as expected
-
+```
+#### Raw data plots with dependent var
+```{r}
 sg<-subset(bms_returns, study_group==1)
 cg<-subset(bms_returns, study_group==0)
+boxplot(bms_returns$return_amt~bms_returns$study_group, xlab="study group") 
+```
+>##### Returns slightly higher for study group in raw data as expected
+```{r}
 boxplot(log(sg$return_amt+1)~sg$post_policy,xlab="post_policy (study group)")
-#Returns go down after policy change in the study group (sans regression modelling)
+```
+>##### Returns go down after policy change in the study group (sans regression modelling)
+```{r}
 boxplot(log(cg$return_amt+1)~cg$post_policy,xlab="post_policy (control group")
-#Returns go down up slightly after policy change in the control group (sans regression modelling)
+```
+>##### Returns go down up slightly after policy change in the control group (sans regression modelling)
 
+```{r}
 plot(log(bms_returns$monthly_sales_cnt+1), log(bms_returns$return_amt+1))
 plot(log(bms_returns$monthly_sales_amt+1), log(bms_returns$return_amt+1))
 plot(bms_returns$store_average_price, log(bms_returns$return_amt+1))
@@ -72,12 +93,9 @@ plot(bms_returns$child_ratio, log(bms_returns$return_amt+1))
 boxplot(log(bms_returns$return_amt+1)~bms_returns$avg_income_code, xlab="avg income code")
 boxplot(log(bms_returns$return_amt+1)~bms_returns$avg_age_band, xlab="avg age band")
 boxplot(log(bms_returns$return_amt+1)~bms_returns$, xlab="avg income code")
-
 ```
-
+#### Stepwise Control Variable Selection
 ```{r}
-#Stepwise Control Variable Selection}
-
 OLSModel<-lm(log(return_amt+1)~post_policy+study_group+log(monthly_sales_amt+1)+log(store_average_price+1)+log(store_number_of_skus+1)+sa_gender+sa_full_time+log(sa_avg_years_of_exp+1)+sa_married+sa_avg_rate_of_pay+sa_dependent+avg_income_code+homeowner_ratio+avg_length_residence+child_ratio+avg_age_band+cust_gender+post_policy*study_group, data=bms_returns)
 
 step<-stepAIC(OLSModel, direction="both") #choose vars
@@ -89,10 +107,10 @@ summary(model_step)
 step<-stepAIC(model_step, direction="both") #choose vars
 step$anova
 ```
+>##### Ignore recommendations
 
+#### Check for Multicollinearity
 ```{r}
-#Check for Multicollinearity
-
 df1_bm<-data.frame(bms_returns$post_policy, bms_returns$study_group,log(bms_returns$monthly_sales_amt+1), log(bms_returns$store_average_price+1),log(bms_returns$store_number_of_skus+1),bms_returns$sa_gender,+log(bms_returns$sa_avg_years_of_exp+1),bms_returns$sa_avg_rate_of_pay, bms_returns$avg_income_code, bms_returns$avg_age_band,bms_returns$homeowner_ratio,bms_returns$child_ratio,bms_returns$avg_length_residence, bms_returns$cust_gender)
 m1_bm<-as.matrix(cor(df1_bm))
 View(m1_bm)
