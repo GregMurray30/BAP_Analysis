@@ -213,7 +213,7 @@ rexp.est
 
 plot(effect(term="post_policy*study_group",mod=negbin1_ol,xlevel=2),multiline=TRUE)
 ```
->###**NEGBIN CONCLUSION:** Interaction term is insignificant - policy change likely has no effect on returns in online channel
+>### **NEGBIN CONCLUSION:** Interaction term is insignificant - policy change likely has no effect on returns in online channel
 
 ### Control Group Isolation
 ```{r}
