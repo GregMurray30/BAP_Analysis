@@ -3,9 +3,9 @@ title: "Return_Policy_Effect_BMS"
 author: Greg Murray
 ---
 
-
-# Policy change impact on bms returns.
-#Model 0 OLS; dependent variable=return_amt; key independent variables=post_policy,study_group, #post_policy*studygroup 
+&#8195;# Policy change impact on bms returns.
+>#### Dependent variable: *return_amt*; 
+>#### Key independent variables: *post_policy*, *study_group*, *post_policy\*studygroup* 
 
 ### Libraries and Dependencies
 ```{r}
@@ -332,5 +332,5 @@ rexp.est
 plot(effect(term="post_policy",mod=negbin_sg,xlevel=2),multiline=TRUE)
 ```
 
->##**Q4 FINAL CONCLUSION: Policy change leads to 25.86% decrease in the number of returns and a 36.62% decrease in the return dollar amount for bms channel**
+>## **Q4 FINAL CONCLUSION: Policy change leads to 25.86% decrease in the number of returns and a 36.62% decrease in the return dollar amount for bms channel**
 
