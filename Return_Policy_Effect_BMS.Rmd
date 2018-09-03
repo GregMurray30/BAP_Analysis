@@ -121,7 +121,8 @@ df2_bm<-data.frame(bms_returns$post_policy,bms_returns$study_group,log(bms_retur
 m2_bm<-as.matrix(cor(df2_bm))
 View(m2_bm)
 vif(m2_bm)
-#remove sa_gender and homeowner_ratio. Using log of monthly_sales_cnt instead of amount decreases multicollinearity with other variables.
+```
+>##### remove sa_gender and homeowner_ratio. Using log of monthly_sales_cnt instead of amount decreases multicollinearity with other variables.
 
 df3_bm<-data.frame(bms_returns$post_policy, bms_returns$study_group,log(bms_returns$monthly_sales_cnt+1),log(bms_returns$sa_avg_years_of_exp+1),bms_returns$avg_income_code,bms_returns$avg_age_band)
 m3_bm<-as.matrix(cor(df3_bm))
