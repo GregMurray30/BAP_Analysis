@@ -1,9 +1,9 @@
 ---
-title: "Return_Policy_Effect_Online"
+title: "Return Policy Effect Online"
 author: Greg Murray
 ---
 
->## Analyis 1: Policy change impact on online returns.
+# Return Policy Change Impact on Online Returns.
 #dependent variable=return_amt; key independent variables=post_policy,study_group, post_policy*studygroup 
 
 ### Libraries and Dependencies
@@ -95,9 +95,10 @@ df<-data.frame(onl_returns$post_policy, onl_returns$study_group, log(onl_returns
 m1_onl<-as.matrix(cor(df))
 View(m1_onl)
 vif(df)
-#multi-collinearity between daily_sales_amt and store_number_of_skus & store_average_price, child_ratio, homeowner_ratio & sales_volume_group. Also, study_group and cust_gender.
+```
+>##### multi-collinearity between daily_sales_amt and store_number_of_skus & store_average_price, child_ratio, homeowner_ratio & sales_volume_group. Also, study_group and cust_gender.
 
-#Can possibly use ave_length_residence to measure homeowners (people don't typically live in the same apartment for a long time)
+>##### Can possibly use ave_length_residence to measure homeowners (people don't typically live in the same apartment for a long time)
 df2_onl<-data.frame(onl_returns$post_policy, onl_returns$study_group, log(onl_returns$daily_sales_amt+1),onl_returns$avg_income_code, onl_returns$avg_age_band)
 
 m2_onl<-as.matrix(cor(df2_onl))
@@ -136,7 +137,7 @@ bptest(modelOLSfin_onl) #heteroskedasticity
 cov.modelOLSfin_onl<- vcovHC(modelOLSfin_onl, type="HC1")
 ```
 
-#### **OLS MODEL CONCLUSION:** Insignificant interaction term, policy change has no effect on returns for online channel
+### **OLS MODEL CONCLUSION: Insignificant interaction term, policy change has no effect on returns for online channel**
 
 ### 2SLS Model Approach
 ```{r}
@@ -213,7 +214,7 @@ rexp.est
 
 plot(effect(term="post_policy*study_group",mod=negbin1_ol,xlevel=2),multiline=TRUE)
 ```
->### **NEGBIN CONCLUSION:** Interaction term is insignificant - policy change likely has no effect on returns in online channel
+>### **NEGBIN CONCLUSION: Interaction term is insignificant - policy change likely has no effect on returns in online channel**
 
 ### Control Group Isolation
 ```{r}
@@ -248,4 +249,5 @@ rexp.est
 ```
 >#### Beta for post_policy is insignicant, therefore without a control group there is no way to isolate the policy change effect in the study group.
 
-## **FINAL CONCLUSION:** policy change likely has no effect on returns in online channel
+## **FINAL CONCLUSION:** 
+>## **Policy change likely has no effect on returns in online channel**
