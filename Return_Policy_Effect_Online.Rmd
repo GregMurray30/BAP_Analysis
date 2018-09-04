@@ -97,9 +97,8 @@ m1_onl<-as.matrix(cor(df))
 View(m1_onl)
 vif(df)
 ```
->##### multi-collinearity between daily_sales_amt and store_number_of_skus & store_average_price, child_ratio, homeowner_ratio & sales_volume_group. Also, study_group and cust_gender.
-
->##### Can possibly use ave_length_residence to measure homeowners (people don't typically live in the same apartment for a long time)
+>##### multi-collinearity between daily_sales_amt and store_number_of_skus & store_average_price, child_ratio, homeowner_ratio & sales_volume_group. Also, study_group and cust_gender. Can possibly use ave_length_residence to measure homeowners (people don't typically live in the same apartment for a long time)
+```{r}
 df2_onl<-data.frame(onl_returns$post_policy, onl_returns$study_group, log(onl_returns$daily_sales_amt+1),onl_returns$avg_income_code, onl_returns$avg_age_band)
 
 m2_onl<-as.matrix(cor(df2_onl))
