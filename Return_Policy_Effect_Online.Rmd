@@ -137,7 +137,7 @@ bptest(modelOLSfin_onl) #heteroskedasticity
 cov.modelOLSfin_onl<- vcovHC(modelOLSfin_onl, type="HC1")
 ```
 
-### **OLS MODEL CONCLUSION: Insignificant interaction term, policy change has no effect on returns for online channel**
+>### **OLS MODEL CONCLUSION: Insignificant interaction term, policy change has no effect on returns for online channel**
 
 ### 2SLS Model Approach
 ```{r}
