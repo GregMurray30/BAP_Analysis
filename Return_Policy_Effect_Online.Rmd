@@ -4,7 +4,8 @@ author: Greg Murray
 ---
 
 # Return Policy Change Impact on Online Returns.
-#dependent variable=return_amt; key independent variables=post_policy,study_group, post_policy*studygroup 
+>### Dependent variable: *return_amt*
+>### Key independent variables: *post_policy*, *study_group*, *post_policy\*studygroup* 
 
 ### Libraries and Dependencies
 ```{r}
